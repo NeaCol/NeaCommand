@@ -1,0 +1,30 @@
+# ----------------------------------------------------------------------
+# NeaCommand - Main Configuration
+# Advanced Command Whitelist & Tab-Completion Blocker powered by LuckPerms
+# ----------------------------------------------------------------------
+
+# Selected language file located inside the 'lang/' directory.
+# Available out of the box: 'en' (English), 'es' (Spanish).
+language: "en"
+
+# Enable debug mode to log command verification and group lookups in console.
+debug-mode: false
+
+# If true, server operators (OP) automatically bypass all whitelist rules.
+bypass-op: true
+
+# Enable anonymous metrics collection via bStats.
+# This helps the author understand usage and improve plugin stability.
+metrics: true
+
+# Commands that are ALWAYS accessible to all players, regardless of their group.
+# Essential for authentication plugins, basic lobby commands, or aliases.
+# Do NOT include the leading '/' character.
+global-whitelist:
+  - "login"
+  - "register"
+  - "l"
+  - "reg"
+  - "neacommand"
+  - "nc"
+  - "nea"

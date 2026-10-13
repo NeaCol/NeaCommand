@@ -1,0 +1,28 @@
+name: NeaCommand
+version: "${project.version}"
+main: com.neacommand.NeaCommand
+api-version: "1.21"
+author: NeaCol
+website: "https://github.com/NeaCol/NeaCommand"
+description: Modern command whitelist and clean tab-completion system powered by LuckPerms.
+folia-supported: true
+depend:
+  - LuckPerms
+
+commands:
+  neacommand:
+    description: Primary administration command for NeaCommand.
+    aliases: [nc, nea]
+    usage: /neacommand <subcommand>
+    permission: neacommand.admin
+
+permissions:
+  neacommand.admin:
+    description: Allows administrative management of command whitelists and settings.
+    default: op
+  neacommand.admin.notify:
+    description: Receives interactive alerts when a player attempts to run a blocked command.
+    default: op
+  neacommand.bypass:
+    description: Completely bypasses command whitelist restrictions.
+    default: op

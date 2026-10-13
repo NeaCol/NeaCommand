@@ -1,0 +1,47 @@
+# ----------------------------------------------------------------------
+# NeaCommand - Archivo de Idioma (Español)
+# Compatible con formato MiniMessage (<color>, <gradient>, <bold>, etc.)
+# ----------------------------------------------------------------------
+
+prefix: "<gradient:#00C9FF:#92FE9D><b>NeaCommand</b></gradient> <dark_gray>»</dark_gray> "
+no-permission: "<red>No tienes permiso para ejecutar este comando."
+command-blocked: "<red><bold>!</bold> <gray>El comando <#ff5555><command></#ff5555> no existe o no tienes acceso a él."
+command-added: "<green>Comando <white><command></white> añadido a la whitelist del grupo <white><group></white>."
+command-removed: "<yellow>Comando <white><command></white> eliminado del grupo <white><group></white>."
+command-not-in-group: "<red>El comando no estaba en la lista de ese grupo."
+group-not-found-lp: "<yellow>El grupo <white><group></white> no parece existir en LuckPerms, pero se ha configurado igual."
+config-reloaded: "<green>Configuración y mensajes recargados correctamente."
+sync-success: "<green>Sincronización con LuckPerms completada. Los grupos han sido actualizados."
+
+# Notificación interactiva cuando un usuario ejecuta un comando bloqueado
+admin-notify: "<gray>[Nea] <yellow><player></yellow> <gray>intentó usar <red><command></red> <gray>(<white><group></white>). <click:run_command:'/nc add <group> <command>'><hover:show_text:'<green>Clic para permitir en grupo <group>'><b><green>[PERMITIR]</green></b></hover></click>"
+
+# Sugerencia interactiva para añadir permiso requerido en LuckPerms
+permission-suggestion: "<gray>Sugerencia: Este comando suele requerir el permiso <aqua><permission></aqua>.<newline><click:suggest_command:'/lp group <group> permission set <permission> true'><hover:show_text:'<green>Clic para preparar comando de LuckPerms'><b><green>[AGREGAR A LUCKPERMS]</green></b></hover></click>"
+
+# Comando /nc check <jugador>
+player-check-header: "<gradient:#00C9FF:#92FE9D><b>NeaCommand - Info de Jugador: <white><player></white></b></gradient>"
+player-check-primary: "<gray>Grupo Primario: <aqua><group></aqua>"
+player-check-inherited: "<gray>Grupos Heredados: <aqua><groups></aqua>"
+player-check-total-commands: "<gray>Comandos Permitidos Totales: <green><count></green>"
+player-check-bypass: "<gray>Bypass Activo: <yellow><bypass></yellow>"
+
+# Lista de comandos por grupo
+list-header: "<green>Comandos permitidos para <white><group></white> (<count>):"
+list-entry: "<gray><command>"
+list-empty: "<yellow>Este grupo no tiene comandos configurados."
+
+# Errores
+player-not-found: "<red>El jugador <white><player></white> no está conectado."
+group-empty-arg: "<red>Por favor especifica un nombre de grupo válido."
+
+help:
+  - "<gray>--------------------------------"
+  - "<gradient:#00C9FF:#92FE9D><b>NeaCommand Ayuda</b></gradient>"
+  - "<gray>/nc add <grupo> <comando> [ocultar: true/false] <dark_gray>- <white>Añadir comando permitido"
+  - "<gray>/nc remove <grupo> <comando> <dark_gray>- <white>Quitar comando"
+  - "<gray>/nc list <grupo> <dark_gray>- <white>Ver comandos permitidos"
+  - "<gray>/nc check <jugador> <dark_gray>- <white>Inspeccionar grupos y comandos del jugador"
+  - "<gray>/nc sync <dark_gray>- <white>Sincronizar grupos de LuckPerms"
+  - "<gray>/nc reload <dark_gray>- <white>Recargar configuración y mensajes"
+  - "<gray>--------------------------------"

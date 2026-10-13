@@ -1,0 +1,69 @@
+# ----------------------------------------------------------------------
+# NeaCommand - Groups Configuration
+# Command whitelist mapped directly to LuckPerms group names.
+#
+# Syntax Guide:
+#   - "/command"         : Player can run this command and it appears in Tab-Complete.
+#   - "/command:hidden"  : Player can run this command, but it remains HIDDEN from Tab-Complete.
+#   - "/warp spawn"      : Allows execution of that specific subcommand.
+#   - "*"                : Grants access to all commands (bypass).
+#
+# Note: LuckPerms inheritance is automatically applied!
+# For example, if 'vip' inherits from 'default' in LuckPerms,
+# VIP players automatically gain access to all commands in 'default'.
+# ----------------------------------------------------------------------
+
+groups:
+  default:
+    commands:
+      - "/help"
+      - "/rules"
+      - "/spawn"
+      - "/msg"
+      - "/r"
+      - "/tpa"
+      - "/tpaccept"
+      - "/tpdeny"
+      - "/pay"
+      - "/balance"
+      - "/baltop"
+      - "/home"
+      - "/sethome"
+      - "/delhome"
+      - "/menu"
+      - "/vote"
+
+  vip:
+    commands:
+      - "/hat"
+      - "/craft"
+      - "/workbench"
+      - "/near"
+      - "/feed"
+      - "/condense"
+      - "/fly:hidden"
+
+  mod:
+    commands:
+      - "/kick"
+      - "/mute"
+      - "/tempmute"
+      - "/unmute"
+      - "/warn"
+      - "/warns"
+      - "/ban"
+      - "/tempban"
+      - "/unban"
+      - "/invsee"
+      - "/enderchest"
+      - "/vanish"
+      - "/v"
+      - "/freeze"
+      - "/staffchat"
+      - "/sc"
+      - "/tp"
+      - "/tphere"
+
+  admin:
+    commands:
+      - "*"
