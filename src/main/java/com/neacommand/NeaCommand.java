@@ -5,7 +5,7 @@ import com.neacommand.listeners.CommandListener;
 import com.neacommand.managers.GroupManager;
 import com.neacommand.managers.TranslationManager;
 import net.luckperms.api.LuckPerms;
-import org.bstats.bukkit.Metrics;
+import com.neacommand.metrics.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -17,7 +17,7 @@ public class NeaCommand extends JavaPlugin {
     private GroupManager groupManager;
 
     // bStats metrics plugin ID
-    private static final int BSTATS_PLUGIN_ID = 22100;
+    private static final int BSTATS_PLUGIN_ID = 34681;
 
     @Override
     public void onEnable() {

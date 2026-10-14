@@ -4,8 +4,8 @@ Modern command whitelist and tab-completion filtering system powered by LuckPerm
 
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg?style=flat-square)](https://www.gnu.org/licenses/gpl-3.0)
 [![Java: 21](https://img.shields.io/badge/Java-21-orange.svg?style=flat-square)](https://www.oracle.com/java/)
-[![Platform: Paper / Purpur / Folia](https://img.shields.io/badge/Platform-Paper%20%7C%20Purpur%20%7C%20Folia-red.svg?style=flat-square)](https://papermc.io/)
-[![bStats](https://img.shields.io/badge/bStats-Metrics-brightgreen.svg?style=flat-square)](https://bstats.org/)
+[![bStats Servers](https://img.shields.io/bstats/servers/34681?style=flat-square)](https://bstats.org/plugin/bukkit/NeaCommand/34681)
+[![bStats Players](https://img.shields.io/bstats/players/34681?style=flat-square)](https://bstats.org/plugin/bukkit/NeaCommand/34681)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/NeaCol/NeaCommand/build.yml?branch=main&style=flat-square)](https://github.com/NeaCol/NeaCommand/actions)
 
 ---
