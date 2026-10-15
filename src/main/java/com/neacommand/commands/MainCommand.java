@@ -1,6 +1,7 @@
 package com.neacommand.commands;
 
 import com.neacommand.NeaCommand;
+import com.neacommand.utils.PermissionResolver;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -186,35 +187,25 @@ public class MainCommand implements CommandExecutor, TabCompleter {
     }
 
     private void suggestPermission(CommandSender sender, String groupName, String commandName) {
-        String permission = null;
-
-        org.bukkit.command.Command targetCmd = Bukkit.getCommandMap().getCommand(commandName);
-        if (targetCmd == null) {
-            targetCmd = Bukkit.getCommandMap().getCommand("minecraft:" + commandName);
-        }
-
-        if (targetCmd != null) {
-            permission = targetCmd.getPermission();
-            if (permission == null || permission.isEmpty()) {
-                String fallback = "minecraft.command." + commandName;
-                if (Bukkit.getPluginManager().getPermission(fallback) != null) {
-                    permission = fallback;
-                }
-            }
-        }
-
-        if (permission == null || permission.isEmpty()) {
-            permission = "neacommand.use." + commandName;
-        }
+        String permission = PermissionResolver.resolvePermission(commandName);
+        if (permission == null || permission.isEmpty()) return;
 
         final String finalPerm = permission;
 
         if (plugin.getLuckPerms() != null) {
             Group lpGroup = plugin.getLuckPerms().getGroupManager().getGroup(groupName);
             if (lpGroup != null) {
-                boolean alreadyHas = lpGroup.getNodes().stream()
-                    .filter(Node::getValue)
-                    .anyMatch(node -> node.getKey().equalsIgnoreCase(finalPerm));
+                boolean alreadyHas = lpGroup.getCachedData().getPermissionData().checkPermission(finalPerm).asBoolean();
+                if (!alreadyHas) {
+                    alreadyHas = lpGroup.getNodes().stream()
+                        .filter(Node::getValue)
+                        .anyMatch(node -> {
+                            String k = node.getKey().toLowerCase();
+                            return k.equals(finalPerm.toLowerCase())
+                                || k.equals("*")
+                                || (finalPerm.contains(".") && k.equals(finalPerm.substring(0, finalPerm.indexOf('.')) + ".*"));
+                        });
+                }
 
                 if (alreadyHas) return;
             }
