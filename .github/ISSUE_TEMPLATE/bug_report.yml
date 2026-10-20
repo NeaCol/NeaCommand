@@ -1,0 +1,41 @@
+name: Bug Report
+description: Report an issue or bug in NeaCommand
+title: "[BUG]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Thank you for helping improve NeaCommand!
+  - type: input
+    id: version
+    attributes:
+      label: Server Software & NeaCommand Version
+      placeholder: "e.g. Paper 1.21.1 / Folia 1.20.4, NeaCommand 1.0.0"
+    validations:
+      required: true
+  - type: input
+    id: luckperms_version
+    attributes:
+      label: LuckPerms Version
+      placeholder: "e.g. LuckPerms v5.4.102"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      description: What unexpected behavior occurred?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      placeholder: "1. Add command /warp to group default\n2. Log in as a player in default group\n3. Try to tab complete..."
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Server Console Logs
+      render: shell
