@@ -1,71 +1,92 @@
-# NeaCommand
+# ⚡ NeaCommand
 
-Modern command whitelist and tab-completion filtering system powered by LuckPerms.
+<div align="center">
 
-[![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg?style=flat-square)](https://www.gnu.org/licenses/gpl-3.0)
-[![Java: 21](https://img.shields.io/badge/Java-21-orange.svg?style=flat-square)](https://www.oracle.com/java/)
-[![bStats Servers](https://img.shields.io/bstats/servers/34681?style=flat-square)](https://bstats.org/plugin/bukkit/NeaCommand/34681)
-[![bStats Players](https://img.shields.io/bstats/players/34681?style=flat-square)](https://bstats.org/plugin/bukkit/NeaCommand/34681)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/NeaCol/NeaCommand/build.yml?branch=main&style=flat-square)](https://github.com/NeaCol/NeaCommand/actions)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Java 21](https://img.shields.io/badge/Java-21-ED8B00?logo=openjdk&logoColor=white)](https://www.oracle.com/java/)
+[![Platform](https://img.shields.io/badge/Platform-Paper%20%7C%20Purpur%20%7C%20Folia-1e87f0)](https://papermc.io/)
+[![bStats](https://img.shields.io/badge/bStats-Plugin%2034681-brightgreen)](https://bstats.org/plugin/bukkit/NeaCommand/34681)
+[![Modrinth](https://img.shields.io/badge/Modrinth-neacommand-00AF5C?logo=modrinth&logoColor=white)](https://modrinth.com/plugin/neacommand)
+[![GitHub](https://img.shields.io/badge/GitHub-NeaCol%2FNeaCommand-black?logo=github)](https://github.com/NeaCol/NeaCommand)
 
----
+**Modern, ultra-fast command whitelist and clean tab-completion system powered by LuckPerms.**
 
-## Features
-
-- **LuckPerms Inheritance:** Groups automatically inherit command permissions according to your LuckPerms hierarchy without duplicate configurations.
-- **Tab-Completion Filtering:** Removes namespace prefixes (`minecraft:`, `bukkit:`, `purpur:`, plugin prefixes) from player autocompletion while retaining whitelisted commands.
-- **Interactive Staff Notifications:** Alerts staff when unauthorized commands are attempted, providing interactive click actions:
-  - `[ALLOW]`: Adds the command directly to the player's group.
-  - `[ADD PERMISSION]`: Prepares the corresponding LuckPerms permission assignment.
-- **Granular Subcommand Support:** Allows whitelisting base commands (`/warp`) or specific subcommands (`/warp spawn`).
-- **Hidden Command Flag:** Allows command execution while suppressing tab completion suggestions via the `:hidden` suffix (e.g., `/fly:hidden`).
-- **Internationalization (i18n):** Shipped with English (`en`) and Spanish (`es`) locales using Adventure MiniMessage.
-- **Folia and Paper Support:** Compatible with modern Paper 1.20-1.21+ and multi-threaded regional servers (Folia).
+</div>
 
 ---
 
-## Commands and Permissions
+### 📖 Overview
 
-### Commands (`/neacommand`, `/nc`, `/nea`)
+**NeaCommand** is an advanced, high-performance command protection and tab-completion sanitization plugin engineered for modern Minecraft servers. Built from the ground up to integrate seamlessly with **LuckPerms**, it eliminates the headache of maintaining redundant permissions and massive command lists.
 
-| Command | Description | Permission |
+Traditional command blockers either fail to hide sensitive commands from tab-completion, break plugin subcommands, or lag your main server thread. **NeaCommand** intercepts commands at the packet level, dynamically resolving LuckPerms inheritance while keeping autocompletion spotless.
+
+---
+
+### ✨ Key Features
+
+* 🛡️ **Total Command Protection**: Restrict unauthorized commands across all player ranks with zero bypass loopholes.
+* 🧬 **Native LuckPerms Inheritance**: Define allowed commands per LuckPerms group. If a rank inherits another rank, it automatically inherits all allowed commands—no duplicate lists needed!
+* 🧹 **Clean Tab-Completion Filtering**: Completely eliminates annoying autocompletions such as `minecraft:`, plugin namespace prefixes (`essentials:`, `worldguard:`), and syntax snooping (`/version`, `/plugins`, `/about`).
+* 🔔 **Interactive Staff Alerts**: When a player attempts an unauthorized command, staff members receive real-time MiniMessage notifications with clickable `[ALLOW]` buttons to instantly add the command to the player's group.
+* 💡 **Intelligent Permission Resolution**: NeaCommand identifies the underlying plugin permission required for any command and provides clickable suggestions (`[ADD PERMISSION]`) directly to LuckPerms!
+* 🚀 **Full Folia & Paper Optimization**: Built with thread-safe scheduling (`SchedulerUtils`) for 100% native compatibility with Paper, Purpur, and Folia multi-threaded tick regions.
+* 🌐 **Multi-Language Support**: Complete internationalization out of the box with English (`en`) and Spanish (`es`) included. Fully customizable with MiniMessage formatting and gradients.
+* 📊 **bStats Telemetry**: Anonymous usage metrics (Plugin ID: `34681`).
+
+---
+
+### 📋 Commands
+
+| Command | Permission | Description |
 | :--- | :--- | :--- |
-| `/nc add <group> <cmd> [hidden]` | Adds a command to a group's whitelist. | `neacommand.admin` |
-| `/nc remove <group> <cmd>` | Removes a command from a group's whitelist. | `neacommand.admin` |
-| `/nc list <group>` | Lists whitelisted commands for a group. | `neacommand.admin` |
-| `/nc check <player>` | Inspects player groups and command statistics. | `neacommand.admin` |
-| `/nc sync` | Synchronizes groups with loaded LuckPerms groups. | `neacommand.admin` |
-| `/nc reload` | Reloads configuration, groups, and translations. | `neacommand.admin` |
-| `/nc help` | Displays the command help menu. | `neacommand.admin` |
+| `/nc add <group> <command> [hidden]` | `neacommand.admin` | Adds an allowed command to a group. Set `hidden` to `true` to allow usage while hiding it from tab-completion. |
+| `/nc remove <group> <command>` | `neacommand.admin` | Removes an allowed command from a group. |
+| `/nc list <group>` | `neacommand.admin` | Displays all currently whitelisted commands for the specified group. |
+| `/nc check <player>` | `neacommand.admin` | Inspects a player's primary group, inherited groups, allowed command count, and bypass state. |
+| `/nc sync` | `neacommand.admin` | Synchronizes configured groups with active LuckPerms groups. |
+| `/nc reload` | `neacommand.admin` | Reloads `config.yml`, `groups.yml`, and language files without restarting. |
+| `/nc help` | `neacommand.admin` | Displays the command guide and subcommands list. |
 
-### Permissions
-
-| Permission | Description | Default |
-| :--- | :--- | :--- |
-| `neacommand.admin` | Administrative access to commands and configuration reloading. | `op` |
-| `neacommand.admin.notify` | Receives interactive notifications when commands are blocked. | `op` |
-| `neacommand.bypass` | Bypasses all command whitelist restrictions. | `op` |
+*Aliases:* `/neacommand`, `/nc`, `/nea`
 
 ---
 
-## Configuration
+### 🔑 Permissions
 
-### `config.yml`
+| Permission | Default | Description |
+| :--- | :--- | :--- |
+| `neacommand.admin` | `op` | Grants access to administrative commands (`/nc reload`, `/nc add`, `/nc check`, etc.). |
+| `neacommand.admin.notify` | `op` | Receives clickable alerts when players try to execute blocked commands. |
+| `neacommand.bypass` | `op` | Completely bypasses the command whitelist and tab-completion filtering. |
 
+---
+
+### ⚙️ Configuration Files
+
+#### `config.yml`
 ```yaml
-# Selected language file located in 'lang/' ('en' or 'es')
+# ----------------------------------------------------------------------
+# NeaCommand - Main Configuration
+# Advanced Command Whitelist & Tab-Completion Blocker powered by LuckPerms
+# ----------------------------------------------------------------------
+
+# Selected language file located inside the 'lang/' directory.
+# Available out of the box: 'en' (English), 'es' (Spanish).
 language: "en"
 
-# Enable debug output in the server console
+# Enable debug mode to log command verification and group lookups in console.
 debug-mode: false
 
-# Server operators (OP) automatically bypass restrictions
+# If true, server operators (OP) automatically bypass all whitelist rules.
 bypass-op: true
 
-# Anonymous metrics collection via bStats
+# Enable anonymous metrics collection via bStats.
 metrics: true
 
-# Commands accessible to all players unconditionally
+# Commands that are ALWAYS accessible to all players, regardless of their group.
+# Essential for authentication plugins, basic lobby commands, or aliases.
+# Do NOT include the leading '/' character.
 global-whitelist:
   - "login"
   - "register"
@@ -76,59 +97,77 @@ global-whitelist:
   - "nea"
 ```
 
-### `groups.yml`
-
+#### `groups.yml`
 ```yaml
+# ----------------------------------------------------------------------
+# NeaCommand - Groups Configuration
+# Command whitelist mapped directly to LuckPerms group names.
+#
+# Syntax Guide:
+#   - "/command"         : Player can run this command and it appears in Tab-Complete.
+#   - "/command:hidden"  : Player can run this command, but it remains HIDDEN from Tab-Complete.
+#   - "/warp spawn"      : Allows execution of that specific subcommand.
+#   - "*"                : Grants access to all commands (bypass).
+#
+# Note: LuckPerms inheritance is automatically applied!
+# For example, if 'vip' inherits from 'default' in LuckPerms,
+# VIP players automatically gain access to all commands in 'default'.
+# ----------------------------------------------------------------------
+
 groups:
   default:
     commands:
       - "/help"
+      - "/rules"
       - "/spawn"
       - "/msg"
+      - "/r"
       - "/tpa"
       - "/tpaccept"
-      - "/home"
-      - "/sethome"
-      - "/menu"
-
+      - "/tpdeny"
+      - "/pay"
+      - "/balance"
+      - "/baltop"
   vip:
     commands:
-      - "/hat"
-      - "/craft"
+      - "/fly"
       - "/feed"
-      - "/fly:hidden" # Allowed, but excluded from tab completion
-
-  admin:
+      - "/hat"
+      - "/workbench"
+  staff:
     commands:
-      - "*" # Access to all commands
+      - "/kick"
+      - "/mute"
+      - "/ban"
+      - "/warn"
+      - "/vanish:hidden"
 ```
 
 ---
 
-## Installation
+### 📦 Requirements
 
-1. Ensure your server runs Paper, Purpur, or Folia (1.20 - 1.21+).
-2. Install [LuckPerms](https://luckperms.net/).
-3. Download the latest `NeaCommand-x.x.x.jar` from the [Releases](https://github.com/NeaCol/NeaCommand/releases) section.
-4. Place the JAR file into your server's `plugins/` directory and restart the server.
-5. Configure permissions in `plugins/NeaCommand/groups.yml` or using `/nc add <group> <command>`.
+* **Platform:** Paper, Purpur, or Folia (`1.20` - `1.21.4+`)
+* **Java:** `Java 21` or newer
+* **Dependencies:** [LuckPerms](https://luckperms.net/) (`v5.4+`)
 
 ---
 
-## Building from Source
+### 🛠️ Compiling from Source
 
-Requirements: Java 21 JDK and Maven.
-
+Requires Java 21 and Maven:
 ```bash
 git clone https://github.com/NeaCol/NeaCommand.git
 cd NeaCommand
 mvn clean package
 ```
-
-The compiled artifact will be located in `target/`.
+The resulting JAR will be located in the `target/` directory.
 
 ---
 
-## License
+### 👨‍💻 Credits & Author
 
-This project is licensed under the GNU General Public License v3.0 (GPL-3.0). See [LICENSE](LICENSE) for details.
+Developed with ❤️ by **NeaCol**.
+* Modrinth: [neacommand](https://modrinth.com/plugin/neacommand)
+* GitHub: [NeaCol/NeaCommand](https://github.com/NeaCol/NeaCommand)
+* Issues & Support: [Bug Tracker](https://github.com/NeaCol/NeaCommand/issues)
