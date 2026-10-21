@@ -9,34 +9,34 @@
 [![Modrinth](https://img.shields.io/badge/Modrinth-neacommand-00AF5C?logo=modrinth&logoColor=white)](https://modrinth.com/plugin/neacommand)
 [![GitHub](https://img.shields.io/badge/GitHub-NeaCol%2FNeaCommand-black?logo=github)](https://github.com/NeaCol/NeaCommand)
 
-**Modern, ultra-fast command whitelist and clean tab-completion system powered by LuckPerms.**
+**Command whitelist and tab-completion filtering system integrated with LuckPerms.**
 
 </div>
 
 ---
 
-### 📖 Overview
+### Overview
 
-**NeaCommand** is an advanced, high-performance command protection and tab-completion sanitization plugin engineered for modern Minecraft servers. Built from the ground up to integrate seamlessly with **LuckPerms**, it eliminates the headache of maintaining redundant permissions and massive command lists.
+**NeaCommand** is a command whitelist and tab-completion filtering plugin for Paper, Purpur, and Folia servers. It integrates with LuckPerms to resolve permissions and group inheritance without duplicate command configurations.
 
-Traditional command blockers either fail to hide sensitive commands from tab-completion, break plugin subcommands, or lag your main server thread. **NeaCommand** intercepts commands at the packet level, dynamically resolving LuckPerms inheritance while keeping autocompletion spotless.
-
----
-
-### ✨ Key Features
-
-* 🛡️ **Total Command Protection**: Restrict unauthorized commands across all player ranks with zero bypass loopholes.
-* 🧬 **Native LuckPerms Inheritance**: Define allowed commands per LuckPerms group. If a rank inherits another rank, it automatically inherits all allowed commands—no duplicate lists needed!
-* 🧹 **Clean Tab-Completion Filtering**: Completely eliminates annoying autocompletions such as `minecraft:`, plugin namespace prefixes (`essentials:`, `worldguard:`), and syntax snooping (`/version`, `/plugins`, `/about`).
-* 🔔 **Interactive Staff Alerts**: When a player attempts an unauthorized command, staff members receive real-time MiniMessage notifications with clickable `[ALLOW]` buttons to instantly add the command to the player's group.
-* 💡 **Intelligent Permission Resolution**: NeaCommand identifies the underlying plugin permission required for any command and provides clickable suggestions (`[ADD PERMISSION]`) directly to LuckPerms!
-* 🚀 **Full Folia & Paper Optimization**: Built with thread-safe scheduling (`SchedulerUtils`) for 100% native compatibility with Paper, Purpur, and Folia multi-threaded tick regions.
-* 🌐 **Multi-Language Support**: Complete internationalization out of the box with English (`en`) and Spanish (`es`) included. Fully customizable with MiniMessage formatting and gradients.
-* 📊 **bStats Telemetry**: Anonymous usage metrics (Plugin ID: `34681`).
+The plugin intercepts command and tab-completion packets directly, evaluating LuckPerms group inheritance and restricting unauthorized command visibility and execution.
 
 ---
 
-### 📋 Commands
+### Features
+
+* **Command Whitelisting**: Restricts command execution based on configured LuckPerms groups.
+* **Inheritance Resolution**: Inherits allowed commands across LuckPerms group hierarchies without duplicate definitions.
+* **Tab-Completion Filtering**: Filters tab-completion packets to hide unauthorized commands, namespace prefixes (`minecraft:`, `essentials:`, `worldguard:`), and discovery commands (`/version`, `/plugins`, `/about`).
+* **Staff Notifications**: Sends MiniMessage alerts when a player attempts an unauthorized command, with clickable `[ALLOW]` actions to add the command to the player's group.
+* **Permission Resolution**: Resolves underlying plugin permissions and provides clickable `[ADD PERMISSION]` suggestions for LuckPerms.
+* **Folia & Paper Support**: Uses `SchedulerUtils` for thread-safe task scheduling across Paper, Purpur, and Folia regional tick architectures.
+* **Localization**: Includes English (`en`) and Spanish (`es`) translations with MiniMessage support.
+* **bStats Telemetry**: Anonymous usage metrics (Plugin ID: `34681`).
+
+---
+
+### Commands
 
 | Command | Permission | Description |
 | :--- | :--- | :--- |
@@ -52,7 +52,7 @@ Traditional command blockers either fail to hide sensitive commands from tab-com
 
 ---
 
-### 🔑 Permissions
+### Permissions
 
 | Permission | Default | Description |
 | :--- | :--- | :--- |
@@ -62,7 +62,7 @@ Traditional command blockers either fail to hide sensitive commands from tab-com
 
 ---
 
-### ⚙️ Configuration Files
+### Configuration Files
 
 #### `config.yml`
 ```yaml
@@ -145,7 +145,7 @@ groups:
 
 ---
 
-### 📦 Requirements
+### Requirements
 
 * **Platform:** Paper, Purpur, or Folia (`1.20` - `1.21.4+`)
 * **Java:** `Java 21` or newer
@@ -153,7 +153,7 @@ groups:
 
 ---
 
-### 🛠️ Compiling from Source
+### Compiling from Source
 
 Requires Java 21 and Maven:
 ```bash
@@ -165,9 +165,9 @@ The resulting JAR will be located in the `target/` directory.
 
 ---
 
-### 👨‍💻 Credits & Author
+### Author & Links
 
-Developed with ❤️ by **NeaCol**.
+* Author: **NeaCol**
 * Modrinth: [neacommand](https://modrinth.com/plugin/neacommand)
 * GitHub: [NeaCol/NeaCommand](https://github.com/NeaCol/NeaCommand)
-* Issues & Support: [Bug Tracker](https://github.com/NeaCol/NeaCommand/issues)
+* Issues: [Bug Tracker](https://github.com/NeaCol/NeaCommand/issues)

@@ -1,8 +1,8 @@
 # Contributing to NeaCommand
 
-Thank you for contributing to **NeaCommand**!
+Guidelines and standards for contributing to **NeaCommand**.
 
-NeaCommand is an advanced command whitelist and tab-completion filtering system powered by LuckPerms for Paper, Purpur, and Folia servers.
+NeaCommand is a command whitelist and tab-completion filtering plugin integrated with LuckPerms for Paper, Purpur, and Folia servers.
 
 ---
 

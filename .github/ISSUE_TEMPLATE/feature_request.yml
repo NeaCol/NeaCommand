@@ -5,7 +5,7 @@ labels: ["enhancement"]
 body:
   - type: markdown
     attributes:
-      value: Thank you for suggesting new ideas for NeaCommand!
+      value: Describe the proposed feature, the problem it addresses, and expected behavior.
   - type: textarea
     id: problem
     attributes:

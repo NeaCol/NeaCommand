@@ -5,7 +5,7 @@ labels: ["bug"]
 body:
   - type: markdown
     attributes:
-      value: Thank you for helping improve NeaCommand!
+      value: Submit environment versions, reproduction steps, and console logs.
   - type: input
     id: version
     attributes:
