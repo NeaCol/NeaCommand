@@ -8,6 +8,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import net.luckperms.api.LuckPerms;
+import net.luckperms.api.event.group.GroupDataRecalculateEvent;
+import net.luckperms.api.event.node.NodeMutateEvent;
 import net.luckperms.api.event.user.UserDataRecalculateEvent;
 import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.user.User;
@@ -26,10 +28,10 @@ public class GroupManager {
     private LuckPerms luckPerms;
 
     // GroupName -> Set of allowed command entries (e.g. "help", "warp spawn")
-    private final Map<String, Set<String>> groupWhitelists = new HashMap<>();
+    private final Map<String, Set<String>> groupWhitelists = new ConcurrentHashMap<>();
     // GroupName -> Set of base commands that should be hidden from TAB
-    private final Map<String, Set<String>> groupHiddenCommands = new HashMap<>();
-    private final Set<String> globalWhitelist = new HashSet<>();
+    private final Map<String, Set<String>> groupHiddenCommands = new ConcurrentHashMap<>();
+    private final Set<String> globalWhitelist = ConcurrentHashMap.newKeySet();
 
     // Player UUID -> Cached allowed entries for execution
     private final Map<UUID, Set<String>> userCache = new ConcurrentHashMap<>();
@@ -44,6 +46,7 @@ public class GroupManager {
     }
 
     private void setupLuckPerms() {
+        if (Bukkit.getServer() == null) return;
         var provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
         if (provider != null) {
             this.luckPerms = provider.getProvider();
@@ -54,8 +57,9 @@ public class GroupManager {
     }
 
     private void setupLuckPermsEventListener() {
-        if (luckPerms == null) return;
+        if (Bukkit.getServer() == null || luckPerms == null) return;
 
+        // 1. Invalidate single user cache when user data recalculates
         luckPerms.getEventBus().subscribe(plugin, UserDataRecalculateEvent.class, event -> {
             UUID uuid = event.getUser().getUniqueId();
             invalidateCache(uuid);
@@ -65,9 +69,31 @@ public class GroupManager {
                 SchedulerUtils.runForPlayerLater(plugin, player, player::updateCommands, 5L);
             }
         });
+
+        // 2. Invalidate all users when group inheritance or data changes
+        luckPerms.getEventBus().subscribe(plugin, GroupDataRecalculateEvent.class, event -> {
+            invalidateAllCache();
+            updateAllPlayersCommands();
+        });
+
+        // 3. Invalidate on node additions/removals
+        luckPerms.getEventBus().subscribe(plugin, NodeMutateEvent.class, event -> {
+            if (event.isGroup()) {
+                invalidateAllCache();
+                updateAllPlayersCommands();
+            } else if (event.isUser() && event.getTarget() instanceof User user) {
+                UUID uuid = user.getUniqueId();
+                invalidateCache(uuid);
+                Player player = Bukkit.getPlayer(uuid);
+                if (player != null && player.isOnline()) {
+                    SchedulerUtils.runForPlayerLater(plugin, player, player::updateCommands, 5L);
+                }
+            }
+        });
     }
 
     public void loadGroups() {
+        if (plugin == null || plugin.getDataFolder() == null) return;
         groupsFile = new File(plugin.getDataFolder(), "groups.yml");
         if (!groupsFile.exists()) {
             plugin.saveResource("groups.yml", false);
@@ -109,8 +135,8 @@ public class GroupManager {
                         hiddenSet.add(extractBaseCommand(clean));
                     }
                 }
-                groupWhitelists.put(groupName.toLowerCase(), allowedSet);
-                groupHiddenCommands.put(groupName.toLowerCase(), hiddenSet);
+                groupWhitelists.put(groupName.toLowerCase(), Set.copyOf(allowedSet));
+                groupHiddenCommands.put(groupName.toLowerCase(), Set.copyOf(hiddenSet));
             }
         }
 
@@ -176,20 +202,54 @@ public class GroupManager {
         String cleanLine = normalizeCommandString(rawMessage);
         if (cleanLine.isEmpty()) return false;
 
-        String baseCmd = extractBaseCommand(cleanLine);
-        if (globalWhitelist.contains(baseCmd) || globalWhitelist.contains(cleanLine)) {
+        String rawBase = cleanLine.split(" ")[0];
+        boolean hasNamespace = rawBase.contains(":");
+        String namespace = null;
+        String baseCmd = rawBase;
+
+        if (hasNamespace) {
+            String[] parts = rawBase.split(":", 2);
+            namespace = parts[0];
+            baseCmd = parts.length > 1 ? parts[1] : "";
+        }
+
+        // 1. Check Global Whitelist
+        if (globalWhitelist.contains(rawBase) || globalWhitelist.contains(cleanLine)) {
+            return true;
+        }
+        if (!hasNamespace && globalWhitelist.contains(baseCmd)) {
             return true;
         }
 
+        // 2. Fetch allowed entries for player
         Set<String> allowedEntries = userCache.computeIfAbsent(
             player.getUniqueId(),
             k -> calculateAllowedCommands(player, false)
         );
 
         if (allowedEntries.contains("*")) return true;
-        if (allowedEntries.contains(baseCmd)) return true;
 
-        // Check if there is an exact subcommand match (e.g., "warp spawn")
+        // Strict namespace check
+        boolean blockUnregisteredNamespaces = plugin.getConfig().getBoolean("block-unregistered-namespaces", true);
+        if (hasNamespace && blockUnregisteredNamespaces) {
+            // Only allow if the exact namespaced command or namespace wildcard is present
+            if (allowedEntries.contains(rawBase) || allowedEntries.contains(namespace + ":*")) {
+                return true;
+            }
+            for (String entry : allowedEntries) {
+                if (entry.contains(" ") && (cleanLine.equals(entry) || cleanLine.startsWith(entry + " "))) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // 3. Normal base command check
+        if (allowedEntries.contains(baseCmd)) {
+            return true;
+        }
+
+        // 4. Check if there is an exact subcommand match (e.g., "warp spawn")
         for (String entry : allowedEntries) {
             if (entry.contains(" ")) {
                 if (cleanLine.equals(entry) || cleanLine.startsWith(entry + " ")) {
@@ -214,13 +274,31 @@ public class GroupManager {
         return allowed;
     }
 
+    /**
+     * Resolves all root base command names that must be visible in the client's
+     * Brigadier command tree (including root commands of allowed subcommands).
+     */
+    public Set<String> getAllowedBaseRootsForBrigadier(Player player) {
+        Set<String> allowed = getAllowedCommandsForTab(player);
+        if (allowed == null) return null;
+
+        Set<String> roots = new HashSet<>();
+        for (String cmd : allowed) {
+            if (cmd.equals("*")) return null;
+            String base = extractBaseCommand(cmd);
+            if (!base.isEmpty()) {
+                roots.add(base);
+            }
+        }
+        return roots;
+    }
+
     private Set<String> calculateAllowedCommands(Player player, boolean filterHidden) {
         Set<String> result = new HashSet<>(globalWhitelist);
         if (luckPerms == null) return result;
 
         User user = luckPerms.getUserManager().getUser(player.getUniqueId());
         if (user == null) {
-            // Never block the main thread with .join()!
             return result;
         }
 
@@ -251,11 +329,12 @@ public class GroupManager {
     public boolean addCommand(String groupName, String command, boolean hidden) {
         groupName = groupName.toLowerCase();
         List<String> list = groupsConfig.getStringList("groups." + groupName + ".commands");
+        boolean isHidden = hidden || command.toLowerCase().endsWith(":hidden");
         String clean = normalizeCommandString(command);
 
         list.removeIf(s -> normalizeCommandString(s).equalsIgnoreCase(clean));
 
-        String entry = "/" + clean + (hidden ? ":hidden" : "");
+        String entry = "/" + clean + (isHidden ? ":hidden" : "");
         list.add(entry);
 
         groupsConfig.set("groups." + groupName + ".commands", list);
@@ -316,7 +395,7 @@ public class GroupManager {
             .collect(Collectors.toList());
     }
 
-    public String extractBaseCommand(String cmd) {
+    public static String extractBaseCommand(String cmd) {
         if (cmd == null || cmd.isEmpty()) return "";
         String clean = normalizeCommandString(cmd);
         String base = clean.split(" ")[0];
@@ -328,7 +407,7 @@ public class GroupManager {
         return base;
     }
 
-    public String normalizeCommandString(String cmd) {
+    public static String normalizeCommandString(String cmd) {
         if (cmd == null) return "";
         String clean = cmd.trim().toLowerCase();
         clean = clean.replace(":hidden", "").trim();
