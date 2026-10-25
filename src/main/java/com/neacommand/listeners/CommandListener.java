@@ -4,7 +4,12 @@ import com.neacommand.NeaCommand;
 import com.neacommand.utils.SchedulerUtils;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
@@ -21,6 +26,8 @@ import org.bukkit.event.server.TabCompleteEvent;
 public class CommandListener implements Listener {
 
     private final NeaCommand plugin;
+    // Rate limit cooldowns to prevent staff chat flooding on command spam
+    private final Map<UUID, Long> adminNotificationCooldowns = new ConcurrentHashMap<>();
 
     public CommandListener(NeaCommand plugin) {
         this.plugin = plugin;
@@ -47,11 +54,53 @@ public class CommandListener implements Listener {
                 Placeholder.parsed("command", commandName)
             );
 
+            // Subtle audio feedback if enabled
+            if (plugin.getConfig().getBoolean("sounds.blocked.enabled", true)) {
+                playBlockedSound(player);
+            }
+
             notifyAdmins(player, commandName);
         }
     }
 
+    private void playBlockedSound(Player player) {
+        String soundKey = plugin.getConfig().getString("sounds.blocked.sound", "ENTITY_VILLAGER_NO");
+        float volume = (float) plugin.getConfig().getDouble("sounds.blocked.volume", 1.0);
+        float pitch = (float) plugin.getConfig().getDouble("sounds.blocked.pitch", 1.0);
+
+        try {
+            org.bukkit.Sound bukkitSound = org.bukkit.Sound.valueOf(soundKey.toUpperCase());
+            player.playSound(player.getLocation(), bukkitSound, volume, pitch);
+        } catch (IllegalArgumentException e) {
+            try {
+                String normalized = soundKey.toLowerCase().replace("_", ".");
+                if (!normalized.contains(":")) {
+                    normalized = "minecraft:" + normalized;
+                }
+                player.playSound(Sound.sound(
+                    Key.key(normalized),
+                    Sound.Source.MASTER,
+                    volume,
+                    pitch
+                ));
+            } catch (Exception ignored) {
+                // Silently skip if invalid sound key
+            }
+        }
+    }
+
     private void notifyAdmins(Player player, String command) {
+        long cooldownSeconds = plugin.getConfig().getLong("admin-notify-cooldown-seconds", 3L);
+        long cooldownMillis = cooldownSeconds * 1000L;
+        long now = System.currentTimeMillis();
+
+        Long lastNotified = adminNotificationCooldowns.get(player.getUniqueId());
+        if (lastNotified != null && (now - lastNotified) < cooldownMillis) {
+            // Rate limit active: suppress notification to prevent chat spam
+            return;
+        }
+        adminNotificationCooldowns.put(player.getUniqueId(), now);
+
         String group = plugin.getGroupManager().getPlayerPrimaryGroup(player);
         Component alert = plugin.getTranslationManager().getComponent(
             "admin-notify",
@@ -118,6 +167,9 @@ public class CommandListener implements Listener {
         Set<String> allowedSet = plugin.getGroupManager().getAllowedCommandsForTab(player);
         if (allowedSet == null) return;
 
+        Set<String> allowedRoots = plugin.getGroupManager().getAllowedBaseRootsForBrigadier(player);
+        if (allowedRoots == null) return;
+
         Collection<String> serverCommands = event.getCommands();
 
         serverCommands.removeIf(command -> {
@@ -128,15 +180,13 @@ public class CommandListener implements Listener {
                 return !allowedSet.contains(check);
             }
 
-            return !allowedSet.contains(check);
+            return !allowedRoots.contains(check);
         });
 
-        // Ensure allowed clean base commands are visible in client brigadier tree
-        for (String allowed : allowedSet) {
-            if (allowed.equals("*") || allowed.contains(":") || allowed.contains(" ")) continue;
-            String clean = allowed.startsWith("/") ? allowed.substring(1) : allowed;
-            if (!serverCommands.contains(clean)) {
-                serverCommands.add(clean);
+        // Ensure allowed clean base commands (including roots of subcommands) are visible in client brigadier tree
+        for (String root : allowedRoots) {
+            if (!serverCommands.contains(root)) {
+                serverCommands.add(root);
             }
         }
     }
@@ -149,6 +199,8 @@ public class CommandListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(PlayerQuitEvent event) {
-        plugin.getGroupManager().invalidateCache(event.getPlayer().getUniqueId());
+        UUID uuid = event.getPlayer().getUniqueId();
+        plugin.getGroupManager().invalidateCache(uuid);
+        adminNotificationCooldowns.remove(uuid);
     }
 }
