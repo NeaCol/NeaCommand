@@ -81,7 +81,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 
         String group = args[1];
         String cmd = args[2].toLowerCase();
-        boolean hidden = args.length >= 4 && args[3].equalsIgnoreCase("true");
+        boolean hidden = cmd.endsWith(":hidden") || (args.length >= 4 && args[3].equalsIgnoreCase("true"));
 
         plugin.getGroupManager().addCommand(group, cmd, hidden);
 

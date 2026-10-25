@@ -37,10 +37,13 @@ public final class PermissionResolver {
             baseCmd = parts[1];
         }
 
-        // 2. Fetch the Command object from Bukkit's CommandMap
-        Command targetCmd = Bukkit.getCommandMap().getCommand(baseCmd);
-        if (targetCmd == null) {
-            targetCmd = Bukkit.getCommandMap().getCommand("minecraft:" + baseCmd);
+        // 2. Fetch the Command object from Bukkit's CommandMap if server is initialized
+        Command targetCmd = null;
+        if (Bukkit.getServer() != null && Bukkit.getCommandMap() != null) {
+            targetCmd = Bukkit.getCommandMap().getCommand(baseCmd);
+            if (targetCmd == null) {
+                targetCmd = Bukkit.getCommandMap().getCommand("minecraft:" + baseCmd);
+            }
         }
 
         // 2a. If the Command object explicitly has a valid permission set
@@ -63,7 +66,7 @@ public final class PermissionResolver {
         }
 
         // Try getting owner from knownCommands keys (e.g. "essentials:home", "cmi:home")
-        if (pluginName == null) {
+        if (pluginName == null && Bukkit.getServer() != null && Bukkit.getCommandMap() != null) {
             Map<String, Command> known = Bukkit.getCommandMap().getKnownCommands();
             for (Map.Entry<String, Command> entry : known.entrySet()) {
                 String key = entry.getKey().toLowerCase();
@@ -101,8 +104,10 @@ public final class PermissionResolver {
             }
         }
 
+        boolean hasPluginManager = Bukkit.getServer() != null && Bukkit.getPluginManager() != null;
+
         // 4. Check standard convention candidates in Bukkit PluginManager
-        if (pluginName != null && !pluginName.equals("minecraft") && !pluginName.equals("bukkit")) {
+        if (hasPluginManager && pluginName != null && !pluginName.equals("minecraft") && !pluginName.equals("bukkit")) {
             // E.g. essentials.home
             String c1 = pluginName + "." + baseCmd;
             if (Bukkit.getPluginManager().getPermission(c1) != null) return c1;
@@ -121,34 +126,36 @@ public final class PermissionResolver {
         }
 
         // 5. Scan registered permissions in Bukkit PluginManager
-        Set<Permission> registered = Bukkit.getPluginManager().getPermissions();
+        if (hasPluginManager) {
+            Set<Permission> registered = Bukkit.getPluginManager().getPermissions();
 
-        // 5a. If pluginName is known, look for any registered permission starting with pluginName and matching baseCmd
-        if (pluginName != null) {
+            // 5a. If pluginName is known, look for any registered permission starting with pluginName and matching baseCmd
+            if (pluginName != null) {
+                for (Permission p : registered) {
+                    String pName = p.getName().toLowerCase();
+                    if (pName.startsWith(pluginName + ".") && (pName.endsWith("." + baseCmd) || pName.equals(pluginName + "." + baseCmd))) {
+                        return p.getName();
+                    }
+                }
+            }
+
+            // 5b. Check any registered permission ending with ".<baseCmd>"
             for (Permission p : registered) {
                 String pName = p.getName().toLowerCase();
-                if (pName.startsWith(pluginName + ".") && (pName.endsWith("." + baseCmd) || pName.equals(pluginName + "." + baseCmd))) {
+                if (pName.endsWith("." + baseCmd) && !pName.contains("*") && !pName.startsWith("neacommand.")) {
                     return p.getName();
                 }
             }
-        }
 
-        // 5b. Check any registered permission ending with ".<baseCmd>"
-        for (Permission p : registered) {
-            String pName = p.getName().toLowerCase();
-            if (pName.endsWith("." + baseCmd) && !pName.contains("*") && !pName.startsWith("neacommand.")) {
-                return p.getName();
+            // 6. Vanilla / Minecraft permissions
+            String vanilla = "minecraft.command." + baseCmd;
+            if (Bukkit.getPluginManager().getPermission(vanilla) != null) {
+                return vanilla;
             }
-        }
-
-        // 6. Vanilla / Minecraft permissions
-        String vanilla = "minecraft.command." + baseCmd;
-        if (Bukkit.getPluginManager().getPermission(vanilla) != null) {
-            return vanilla;
-        }
-        String bukkit = "bukkit.command." + baseCmd;
-        if (Bukkit.getPluginManager().getPermission(bukkit) != null) {
-            return bukkit;
+            String bukkit = "bukkit.command." + baseCmd;
+            if (Bukkit.getPluginManager().getPermission(bukkit) != null) {
+                return bukkit;
+            }
         }
 
         // 7. If pluginName is known (e.g. Essentials), use pluginName.baseCmd (e.g. essentials.home)
