@@ -28,6 +28,11 @@ sounds:
     volume: 1.0
     pitch: 1.0
 
+# Security audit logging for blocked command attempts
+logging:
+  blocked-commands:
+    enabled: true
+
 # Enable anonymous metrics collection via bStats.
 # This helps the author understand usage and improve plugin stability.
 metrics: true

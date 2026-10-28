@@ -59,8 +59,33 @@ public class CommandListener implements Listener {
                 playBlockedSound(player);
             }
 
+            logBlockedCommand(player, message);
+
             notifyAdmins(player, commandName);
         }
+    }
+
+    private void logBlockedCommand(Player player, String command) {
+        if (!plugin.getConfig().getBoolean("logging.blocked-commands.enabled", true)) return;
+
+        SchedulerUtils.runGlobal(plugin, () -> {
+            try {
+                java.io.File logDir = new java.io.File(plugin.getDataFolder(), "logs");
+                if (!logDir.exists()) logDir.mkdirs();
+                java.io.File logFile = new java.io.File(logDir, "blocked_commands.log");
+                String timestamp = java.time.LocalDateTime.now().format(
+                    java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                );
+                String entry = String.format("[%s] [SECURITY] Player: %s (%s) | World: %s | Command: %s%n",
+                    timestamp, player.getName(), player.getUniqueId(), player.getWorld().getName(), command);
+                java.nio.file.Files.writeString(
+                    logFile.toPath(),
+                    entry,
+                    java.nio.file.StandardOpenOption.CREATE,
+                    java.nio.file.StandardOpenOption.APPEND
+                );
+            } catch (Exception ignored) {}
+        });
     }
 
     private void playBlockedSound(Player player) {
