@@ -258,6 +258,19 @@ public class GroupManager {
             }
         }
 
+        // 5. Check for world-specific constraints (e.g., "fly@hub" or "heal@arena")
+        String currentWorld = player.getWorld().getName().toLowerCase();
+        for (String entry : allowedEntries) {
+            if (entry.contains("@")) {
+                String[] parts = entry.split("@", 2);
+                String entryCmd = parts[0];
+                String targetWorld = parts[1].toLowerCase();
+                if (currentWorld.equals(targetWorld) && (baseCmd.equals(entryCmd) || cleanLine.equals(entryCmd) || cleanLine.startsWith(entryCmd + " "))) {
+                    return true;
+                }
+            }
+        }
+
         return false;
     }
 
@@ -398,6 +411,9 @@ public class GroupManager {
     public static String extractBaseCommand(String cmd) {
         if (cmd == null || cmd.isEmpty()) return "";
         String clean = normalizeCommandString(cmd);
+        if (clean.contains("@")) {
+            clean = clean.split("@", 2)[0];
+        }
         String base = clean.split(" ")[0];
 
         if (base.contains(":")) {

@@ -29,6 +29,8 @@ class GroupManagerTest {
         assertEquals("fly", GroupManager.extractBaseCommand("essentials:fly:hidden"));
         assertEquals("ban", GroupManager.extractBaseCommand("/ban player reason"));
         assertEquals("msg", GroupManager.extractBaseCommand("/msg Notch hello there"));
+        assertEquals("fly", GroupManager.extractBaseCommand("/fly@hub"));
+        assertEquals("heal", GroupManager.extractBaseCommand("heal:hidden@arena"));
         assertEquals("", GroupManager.extractBaseCommand(""));
         assertEquals("", GroupManager.extractBaseCommand(null));
         assertEquals("", GroupManager.extractBaseCommand("   "));
