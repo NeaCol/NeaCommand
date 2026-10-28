@@ -9,6 +9,10 @@
 [![Modrinth](https://img.shields.io/badge/Modrinth-neacommand-00AF5C?logo=modrinth&logoColor=white)](https://modrinth.com/plugin/neacommand)
 [![GitHub](https://img.shields.io/badge/GitHub-NeaCol%2FNeaCommand-black?logo=github)](https://github.com/NeaCol/NeaCommand)
 
+<p align="center">
+  <img src="https://skillicons.dev/icons?i=java,maven,git,linux,bash&theme=dark" alt="Supported Tech Stack" />
+</p>
+
 **Command whitelist and tab-completion filtering system integrated with LuckPerms.**
 
 </div>
@@ -28,6 +32,8 @@ The plugin intercepts command and tab-completion packets directly, evaluating Lu
 * **Command Whitelisting**: Restricts command execution based on configured LuckPerms groups.
 * **Inheritance Resolution**: Inherits allowed commands across LuckPerms group hierarchies without duplicate definitions.
 * **Tab-Completion Filtering**: Filters tab-completion packets to hide unauthorized commands, namespace prefixes (`minecraft:`, `essentials:`, `worldguard:`), and discovery commands (`/version`, `/plugins`, `/about`).
+* **World-Specific Whitelisting**: Restrict commands to specific worlds using `command@world` syntax (e.g. `/fly@hub`).
+* **Security Audit Logging**: Asynchronous security logging to `logs/blocked_commands.log` recording player, UUID, world, and unauthorized attempts.
 * **Staff Notifications**: Sends MiniMessage alerts when a player attempts an unauthorized command, with clickable `[ALLOW]` actions to add the command to the player's group.
 * **Permission Resolution**: Resolves underlying plugin permissions and provides clickable `[ADD PERMISSION]` suggestions for LuckPerms.
 * **Folia & Paper Support**: Uses `SchedulerUtils` for thread-safe task scheduling across Paper, Purpur, and Folia regional tick architectures.
